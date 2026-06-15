@@ -45,7 +45,8 @@ class SpoilerBot(discord.Client):
         self.tree = app_commands.CommandTree(self)
 
     async def setup_hook(self):
-        await self.tree.sync()
+        synced = await self.tree.sync()
+        print(f"{len(synced)}개 명령어 동기화 완료")
 
 
 client = SpoilerBot()
@@ -61,7 +62,7 @@ async def on_message(message):
     if message.author.bot:
         return
 
-    if not message.guild:
+    if message.guild is None:
         return
 
     guild_config = get_guild_config(message.guild.id)
@@ -83,14 +84,14 @@ async def on_message(message):
             file = await attachment.to_file(spoiler=True)
             spoiler_files.append(file)
         except Exception as e:
-            print("파일 처리 실패:", e)
+            print(f"파일 처리 실패: {e}")
 
     if spoiler_files:
         try:
             await message.channel.send(files=spoiler_files)
             await message.delete()
         except Exception as e:
-            print("업로드 실패:", e)
+            print(f"업로드 실패: {e}")
 
 
 @client.tree.command(name="핑", description="봇 상태 확인")
@@ -117,7 +118,7 @@ async def status(interaction: discord.Interaction):
 async def enable(interaction: discord.Interaction):
     if not interaction.user.guild_permissions.administrator:
         await interaction.response.send_message(
-            "❌ 관리자만 사용 가능합니다.",
+            "❌ 관리자만 사용할 수 있습니다.",
             ephemeral=True
         )
         return
@@ -126,14 +127,16 @@ async def enable(interaction: discord.Interaction):
     guild_config["enabled"] = True
     save_config()
 
-    await interaction.response.send_message("✅ 자동 스포일러 켜짐")
+    await interaction.response.send_message(
+        "✅ 자동 스포일러가 켜졌습니다."
+    )
 
 
 @client.tree.command(name="끄기", description="자동 스포일러 끄기")
 async def disable(interaction: discord.Interaction):
     if not interaction.user.guild_permissions.administrator:
         await interaction.response.send_message(
-            "❌ 관리자만 사용 가능합니다.",
+            "❌ 관리자만 사용할 수 있습니다.",
             ephemeral=True
         )
         return
@@ -142,17 +145,20 @@ async def disable(interaction: discord.Interaction):
     guild_config["enabled"] = False
     save_config()
 
-    await interaction.response.send_message("❌ 자동 스포일러 꺼짐")
+    await interaction.response.send_message(
+        "❌ 자동 스포일러가 꺼졌습니다."
+    )
 
 
-@client.tree.command(name="채널설정", description="감시 채널 설정")
+@client.tree.command(name="채널설정", description="감시할 채널 지정")
+@app_commands.describe(channel="감시할 채널")
 async def set_channel(
     interaction: discord.Interaction,
     channel: discord.TextChannel
 ):
     if not interaction.user.guild_permissions.administrator:
         await interaction.response.send_message(
-            "❌ 관리자만 사용 가능합니다.",
+            "❌ 관리자만 사용할 수 있습니다.",
             ephemeral=True
         )
         return
@@ -166,11 +172,11 @@ async def set_channel(
     )
 
 
-@client.tree.command(name="채널해제", description="채널 제한 해제")
+@client.tree.command(name="채널해제", description="모든 채널 감시")
 async def clear_channel(interaction: discord.Interaction):
     if not interaction.user.guild_permissions.administrator:
         await interaction.response.send_message(
-            "❌ 관리자만 사용 가능합니다.",
+            "❌ 관리자만 사용할 수 있습니다.",
             ephemeral=True
         )
         return
@@ -180,7 +186,7 @@ async def clear_channel(interaction: discord.Interaction):
     save_config()
 
     await interaction.response.send_message(
-        "✅ 모든 채널 감시로 변경되었습니다."
+        "✅ 모든 채널을 감시하도록 변경했습니다."
     )
 
 
