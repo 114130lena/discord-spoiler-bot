@@ -25,18 +25,15 @@ async def on_message(message):
 
     for attachment in message.attachments:
 
-        if attachment.content_type and attachment.content_type.startswith("image/"):
+        file = await attachment.to_file(
+            filename=f"SPOILER_{attachment.filename}"
+        )
 
-            file = await attachment.to_file(
-                filename=f"SPOILER_{attachment.filename}"
-            )
-
-            spoiler_files.append(file)
+        spoiler_files.append(file)
 
     if spoiler_files:
 
         await message.channel.send(
-            content=f"{message.author.display_name}",
             files=spoiler_files
         )
 
