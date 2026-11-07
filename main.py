@@ -190,4 +190,8 @@ async def clear_channel(interaction: discord.Interaction):
     )
 
 
+# 외부 HTTPS 미디어를 Discord Media Gallery로 검증하는 테스트 명령어
+from media_test import register_media_test
+register_media_test(client)
+
 client.run(TOKEN)
