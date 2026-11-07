@@ -1,0 +1,9 @@
+[Unit]
+Description=Update discord-spoiler-bot from GitHub
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/discord-spoiler-update.env
+ExecStart=/usr/local/bin/discord-spoiler-update
