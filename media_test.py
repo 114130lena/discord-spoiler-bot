@@ -66,7 +66,7 @@ def register_media_test(client: discord.Client) -> None:
 
         view = discord.ui.LayoutView()
         view.add_item(discord.ui.TextDisplay(
-            "## 🎬 외부 미디어 재생 테스트\\n"
+            "## 🎬 외부 미디어 재생 테스트\n"
             "아래 미디어의 **재생 버튼을 누르면 디스코드 내부에서 재생되는지** 확인해 주세요. "
             "외부 파일을 Discord에 업로드하지 않습니다."
         ))
