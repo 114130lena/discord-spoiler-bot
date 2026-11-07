@@ -15,6 +15,9 @@ before=$(git -C "$SPOILER_REPO_DIR" rev-parse HEAD)
 git -C "$SPOILER_REPO_DIR" fetch origin main --quiet
 after=$(git -C "$SPOILER_REPO_DIR" rev-parse origin/main)
 if [[ "$before" == "$after" ]]; then exit 0; fi
+# Validate the incoming source before changing the running checkout.
+git -C "$SPOILER_REPO_DIR" show "origin/main:main.py" | "$SPOILER_VENV_PYTHON" -c 'import ast,sys;ast.parse(sys.stdin.read())'
+git -C "$SPOILER_REPO_DIR" show "origin/main:media_test.py" | "$SPOILER_VENV_PYTHON" -c 'import ast,sys;ast.parse(sys.stdin.read())'
 git -C "$SPOILER_REPO_DIR" merge --ff-only origin/main
 "$SPOILER_VENV_PYTHON" -m pip install -r "$SPOILER_REPO_DIR/requirements.txt"
 "$SPOILER_VENV_PYTHON" -m py_compile "$SPOILER_REPO_DIR/main.py" "$SPOILER_REPO_DIR/media_test.py"
